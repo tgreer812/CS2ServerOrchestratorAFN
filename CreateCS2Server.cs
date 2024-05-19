@@ -27,8 +27,6 @@ namespace Tyler.Greer
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
-            HttpResponseData test = req.CreateResponse(System.Net.HttpStatusCode.OK);
-            return test;
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic? data = JsonConvert.DeserializeObject(requestBody);
@@ -62,6 +60,9 @@ namespace Tyler.Greer
                 await res.WriteAsJsonAsync(new { error = "STORAGE_ACCOUNT_KEY is required" });
                 return res;
             }
+
+            HttpResponseData test = req.CreateResponse(System.Net.HttpStatusCode.OK);
+            return test;
 
             var credentials = new DefaultAzureCredential(new DefaultAzureCredentialOptions
             {
