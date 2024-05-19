@@ -61,17 +61,17 @@ namespace Tyler.Greer
                 return res;
             }
 
-            var credentials = new DefaultAzureCredential(new DefaultAzureCredentialOptions
-            {
-                ExcludeVisualStudioCodeCredential = true,
-                ExcludeVisualStudioCredential = true
-            });
-
             ArmClient armClient;
             SubscriptionResource subscription;
             ResourceGroupResource resourceGroup;
             try
             {
+                var credentials = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+                {
+                    ExcludeVisualStudioCodeCredential = true,
+                    ExcludeVisualStudioCredential = true
+                });
+
                 armClient = new ArmClient(credentials);
                 subscription = await armClient.GetDefaultSubscriptionAsync();
                 resourceGroup = await subscription.GetResourceGroups().GetAsync(resourceGroupName);
