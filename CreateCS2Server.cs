@@ -31,13 +31,16 @@ namespace Tyler.Greer
             dynamic? data = JsonConvert.DeserializeObject(requestBody);
 
             // Retrieve the SRCDS_TOKEN from environment variables
-            string? srcdsToken = Environment.GetEnvironmentVariable("SRCDS_TOKEN");
-            if (string.IsNullOrEmpty(srcdsToken))
-            {
-                var badRequestResponse = req.CreateResponse(System.Net.HttpStatusCode.BadRequest);
-                await badRequestResponse.WriteStringAsync("SRCDS_TOKEN is not configured.");
-                return badRequestResponse;
-            }
+            string? srcdsToken = Environment.GetEnvironmentVariable("SRCDS_TOKEN") ?? "";
+
+            // TODO: Uncomment the following code block to validate the SRCDS_TOKEN
+            // and remove the hardcoded value above
+            // if (string.IsNullOrEmpty(srcdsToken))
+            // {
+            //     var badRequestResponse = req.CreateResponse(System.Net.HttpStatusCode.BadRequest);
+            //     await badRequestResponse.WriteStringAsync("SRCDS_TOKEN is not configured.");
+            //     return badRequestResponse;
+            // }
 
             // Set internal configuration
             string serverName = "CS2_Game_Server"; // Automatically set server name
@@ -47,11 +50,17 @@ namespace Tyler.Greer
             string cs2Cheats = data?.CS2_CHEATS ?? "0";
 
             string containerGroupName = "cs2containergroup";
-            string resourceGroupName = "myResourceGroup";
+            string resourceGroupName = "tc-cs2-rg";
             //string location = "eastus";
             string imageName = "joedwards32/cs2"; // Assuming the image is public or accessible
 
-            ArmClient armClient = new(new DefaultAzureCredential());
+            var credentials = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+            {
+                ExcludeVisualStudioCodeCredential = true,
+                ExcludeVisualStudioCredential = true
+            });
+
+            ArmClient armClient = new ArmClient(credentials);
             SubscriptionResource subscription = await armClient.GetDefaultSubscriptionAsync();
             ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(resourceGroupName);
 
@@ -120,7 +129,6 @@ namespace Tyler.Greer
                 Ports = new
                 {
                     GamePort = cs2Port,
-                    RconPort = rconPort,
                     TvPort = "27020"
                 }
             });
