@@ -67,12 +67,20 @@ namespace Tyler.Greer
                 ExcludeVisualStudioCredential = true
             });
 
-            ArmClient armClient = new ArmClient(credentials);
-            SubscriptionResource subscription = await armClient.GetDefaultSubscriptionAsync();
-            ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(resourceGroupName);
-
-            HttpResponseData test = req.CreateResponse(System.Net.HttpStatusCode.OK);
-            return test;
+            ArmClient armClient;
+            SubscriptionResource subscription;
+            ResourceGroupResource resourceGroup;
+            try
+            {
+                armClient = new ArmClient(credentials);
+                subscription = await armClient.GetDefaultSubscriptionAsync();
+                resourceGroup = await subscription.GetResourceGroups().GetAsync(resourceGroupName);
+            } catch (Exception e)
+            {
+                var res = req.CreateResponse(System.Net.HttpStatusCode.InternalServerError);
+                await res.WriteAsJsonAsync(new { error = e.Message });
+                return res;
+            }
 
             // Define container resource requirements
             var containerResourceRequests = new ContainerResourceRequestsContent(2, 2);
