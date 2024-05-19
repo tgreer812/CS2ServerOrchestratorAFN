@@ -61,9 +61,6 @@ namespace Tyler.Greer
                 return res;
             }
 
-            HttpResponseData test = req.CreateResponse(System.Net.HttpStatusCode.OK);
-            return test;
-
             var credentials = new DefaultAzureCredential(new DefaultAzureCredentialOptions
             {
                 ExcludeVisualStudioCodeCredential = true,
@@ -73,6 +70,9 @@ namespace Tyler.Greer
             ArmClient armClient = new ArmClient(credentials);
             SubscriptionResource subscription = await armClient.GetDefaultSubscriptionAsync();
             ResourceGroupResource resourceGroup = await subscription.GetResourceGroups().GetAsync(resourceGroupName);
+
+            HttpResponseData test = req.CreateResponse(System.Net.HttpStatusCode.OK);
+            return test;
 
             // Define container resource requirements
             var containerResourceRequests = new ContainerResourceRequestsContent(2, 2);
