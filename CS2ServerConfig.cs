@@ -35,11 +35,23 @@ namespace Tyler.Greer
 
         public CS2ServerConfig(dynamic data)
         {
-            SrcdsToken = data?.SRCDS_TOKEN ?? Environment.GetEnvironmentVariable("SRCDS_TOKEN") ?? "";
+
+            // Possible null reference assignment.
+            // This is ok because we're checking and throwing an exception if the value is null.
+#pragma warning disable CS8601
+            SrcdsToken = data?.SRCDS_TOKEN;
+
             if (string.IsNullOrEmpty(SrcdsToken))
             {
-                throw new ArgumentException("SRCDS_TOKEN is required");
+                SrcdsToken = Environment.GetEnvironmentVariable("SRCDS_TOKEN");
+#pragma warning restore CS8601
+
+                if (string.IsNullOrEmpty(SrcdsToken))
+                {
+                    throw new ArgumentException("SRCDS_TOKEN is required");
+                }
             }
+
 
             ServerName = data?.CS2_SERVERNAME ?? "CS2_Game_Server";
             ServerPassword = data?.CS2_PW ?? string.Empty;
